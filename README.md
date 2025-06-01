@@ -93,53 +93,42 @@ git clone https://github.com/carmesotuyo/contact-manager.git
 cd contact-manager
 ```
 
-2. Install frontend dependencies:
+2. Install all dependencies:
 
 ```bash
-cd frontend
-npm install
+npm run install:all
 ```
 
-3. Install backend dependencies:
+3. Set up environment variables:
+
+Frontend (.env.local):
 
 ```bash
-cd ../backend
-npm install
-```
-
-4. Set up environment variables:
-
-```bash
-# Frontend (.env.local)
-NEXT_PUBLIC_API_URL=http://localhost:3001
-NEXT_PUBLIC_GOOGLE_PLACES_API_KEY=your_api_key
-
-# Backend (.env)
+NEXT_PUBLIC_API_URL=http://localhost:3000
 PORT=3001
+NEXT_PUBLIC_GOOGLE_PLACES_API_KEY=your_api_key
+```
+
+Backend (.env):
+
+```bash
+PORT=3000
 JWT_SECRET=your_jwt_secret
 ```
 
-5. Start the development servers:
+### Development
 
-```bash
-# Terminal 1 - Frontend
-cd frontend
-npm run dev
+The project uses npm workspaces to manage both frontend and backend services. Available scripts:
 
-# Terminal 2 - Backend
-cd backend
-npm run dev
-```
+#### Main Commands
 
-## Features
-
-- User authentication with JWT
-- Contact management (CRUD operations)
-- Notes management
-- Google Places API integration for address lookup
-- Mobile-responsive design
-- Form validation
-- Image upload for profile pictures
+- `npm run dev` - Start both frontend and backend in development mode
+- `npm run dev:frontend` - Start only frontend
+- `npm run dev:backend` - Start only backend
+- `npm run build` - Build both applications
+- `npm run test` - Run tests for both applications
+- `npm run format` - Format code using Prettier
+- `npm run clean` - Remove all generated files and dependencies
 
 ## API Endpoints
 
@@ -160,6 +149,16 @@ npm run dev
 - `POST /api/contacts/{contactId}/notes` - Create note
 - `GET /api/notes` - Get paginated notes list
 - `GET /api/notes/{noteId}` - Get note details
+
+## Features
+
+- User authentication with JWT
+- Contact management (CRUD operations)
+- Notes management
+- Google Places API integration for address lookup
+- Mobile-responsive design
+- Form validation
+- Image upload for profile pictures
 
 ## License
 
