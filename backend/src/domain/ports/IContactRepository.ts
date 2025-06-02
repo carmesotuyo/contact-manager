@@ -2,14 +2,20 @@ import { Contact } from '../entities/Contact';
 
 export interface ContactSearchCriteria {
   userId?: string;
-  name?: string;
-  email?: string;
+  query?: string;
   page?: number;
   limit?: number;
 }
 
+export interface ContactSearchResult {
+  items: Contact[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
 export interface IContactRepository {
-  findAll(criteria: ContactSearchCriteria): Promise<Contact[]>;
+  findAll(criteria: ContactSearchCriteria): Promise<ContactSearchResult>;
   findById(id: string): Promise<Contact | null>;
   findByEmail(email: string): Promise<Contact | null>;
   save(contact: Contact): Promise<Contact>;
