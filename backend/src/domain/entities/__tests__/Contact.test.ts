@@ -1,11 +1,27 @@
 import { Contact, ContactData } from '../Contact';
+import { Address } from '../../value-objects/Address';
+import { ProfilePicture } from '../../value-objects/ProfilePicture';
 
 describe('Contact Entity', () => {
+  const mockAddress = Address.create({
+    placeId: 'place123',
+    formattedAddress: '123 Main St',
+  });
+  const mockProfilePicture = ProfilePicture.create({
+    filename: 'profile.jpg',
+  });
+
   const validContactData: ContactData = {
     userId: 'user123',
     name: 'John Doe',
     email: 'john@example.com',
     phone: '+1 (555) 123-4567',
+  };
+
+  const validContactWithAddressData: ContactData = {
+    ...validContactData,
+    address: mockAddress,
+    profilePicture: mockProfilePicture,
   };
 
   describe('create', () => {
@@ -15,6 +31,7 @@ describe('Contact Entity', () => {
       expect(contact.getName()).toBe('John Doe');
       expect(contact.getEmail()).toBe('john@example.com');
       expect(contact.getPhone()).toBe('+1 (555) 123-4567');
+      expect(contact.getUserId()).toBe('user123');
     });
 
     it('should generate an id if not provided', () => {
@@ -39,6 +56,28 @@ describe('Contact Entity', () => {
       expect(() => Contact.create({ ...validContactData, phone: '123' })).toThrow(
         'Phone number must be at least 6 characters long',
       );
+    });
+  });
+
+  describe('getters', () => {
+    it('should return address when set', () => {
+      const contact = Contact.create(validContactWithAddressData);
+      expect(contact.getAddress()).toBe(mockAddress);
+    });
+
+    it('should return undefined when address not set', () => {
+      const contact = Contact.create(validContactData);
+      expect(contact.getAddress()).toBeUndefined();
+    });
+
+    it('should return profile picture when set', () => {
+      const contact = Contact.create(validContactWithAddressData);
+      expect(contact.getProfilePicture()).toBe(mockProfilePicture);
+    });
+
+    it('should return undefined when profile picture not set', () => {
+      const contact = Contact.create(validContactData);
+      expect(contact.getProfilePicture()).toBeUndefined();
     });
   });
 
@@ -75,10 +114,42 @@ describe('Contact Entity', () => {
         'Phone number must be at least 6 characters long',
       );
     });
+
+    it('should update address', () => {
+      const newAddress = Address.create({
+        placeId: 'place456',
+        formattedAddress: '456 Oak St',
+      });
+      contact.updateDetails({ address: newAddress });
+      expect(contact.getAddress()).toBe(newAddress);
+    });
+
+    it('should update profile picture', () => {
+      const newProfilePic = ProfilePicture.create({
+        filename: 'new-profile.jpg',
+      });
+      contact.updateDetails({ profilePicture: newProfilePic });
+      expect(contact.getProfilePicture()).toBe(newProfilePic);
+    });
   });
 
   describe('toJSON', () => {
-    it('should return correct JSON representation', () => {
+    it('should return correct JSON representation with all fields', () => {
+      const contact = Contact.create(validContactWithAddressData);
+      const json = contact.toJSON();
+
+      expect(json).toEqual({
+        id: contact.id,
+        userId: validContactWithAddressData.userId,
+        name: validContactWithAddressData.name,
+        email: validContactWithAddressData.email,
+        phone: validContactWithAddressData.phone,
+        address: mockAddress.toJSON(),
+        profilePicture: mockProfilePicture.toJSON(),
+      });
+    });
+
+    it('should return correct JSON representation without optional fields', () => {
       const contact = Contact.create(validContactData);
       const json = contact.toJSON();
 
