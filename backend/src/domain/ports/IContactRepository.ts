@@ -1,24 +1,12 @@
 import { Contact } from '../entities/Contact';
+import { BaseSearchCriteria, IBaseRepository } from './IBaseRepository';
 
-export interface ContactSearchCriteria {
+export interface ContactSearchCriteria extends BaseSearchCriteria {
   userId?: string;
   query?: string;
-  page?: number;
-  limit?: number;
 }
 
-export interface ContactSearchResult {
-  items: Contact[];
-  total: number;
-  page: number;
-  limit: number;
-}
-
-export interface IContactRepository {
-  findAll(criteria: ContactSearchCriteria): Promise<ContactSearchResult>;
-  findById(id: string): Promise<Contact | null>;
+export interface IContactRepository extends IBaseRepository<Contact, ContactSearchCriteria> {
   findByEmail(email: string): Promise<Contact | null>;
-  save(contact: Contact): Promise<Contact>;
-  delete(id: string): Promise<void>;
-  count(criteria: ContactSearchCriteria): Promise<number>;
+  findByUserId(userId: string): Promise<Contact[]>;
 }

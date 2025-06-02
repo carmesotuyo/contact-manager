@@ -1,24 +1,13 @@
 import { Note } from '../entities/Note';
+import { BaseSearchCriteria, IBaseRepository } from './IBaseRepository';
 
-export interface NoteSearchCriteria {
+export interface NoteSearchCriteria extends BaseSearchCriteria {
   userId?: string;
   contactId?: string;
-  page?: number;
-  limit?: number;
 }
 
-export interface NoteSearchResult {
-  items: Note[];
-  total: number;
-  page: number;
-  limit: number;
-}
-
-export interface INoteRepository {
-  findAll(criteria: NoteSearchCriteria): Promise<NoteSearchResult>;
-  findById(id: string): Promise<Note | null>;
+export interface INoteRepository extends IBaseRepository<Note, NoteSearchCriteria> {
   findByContactId(contactId: string): Promise<Note[]>;
-  save(note: Note): Promise<Note>;
-  delete(id: string): Promise<void>;
+  findByUserId(userId: string): Promise<Note[]>;
   deleteByContactId(contactId: string): Promise<void>;
 }
