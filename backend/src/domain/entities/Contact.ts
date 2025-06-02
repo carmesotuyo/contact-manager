@@ -1,5 +1,7 @@
 import { Address } from '../value-objects/Address';
 import { ProfilePicture } from '../value-objects/ProfilePicture';
+import { Email } from '../value-objects/Email';
+import { PhoneNumber } from '../value-objects/PhoneNumber';
 
 export interface ContactData {
   id?: string;
@@ -16,8 +18,8 @@ export class Contact {
     readonly id: string,
     private userId: string,
     private name: string,
-    private email: string,
-    private phone: string,
+    private email: Email,
+    private phone: PhoneNumber,
     private address?: Address,
     private profilePicture?: ProfilePicture,
   ) {}
@@ -27,22 +29,15 @@ export class Contact {
       throw new Error('Name must be at least 2 characters long');
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!data.email || !emailRegex.test(data.email)) {
-      throw new Error('Invalid email format');
-    }
-
-    const phoneRegex = /^\+?[\d\s-()]{8,}$/;
-    if (!data.phone || !phoneRegex.test(data.phone)) {
-      throw new Error('Phone number must be at least 6 characters long');
-    }
+    const email = Email.create(data.email);
+    const phone = PhoneNumber.create(data.phone);
 
     return new Contact(
       data.id || crypto.randomUUID(),
       data.userId,
       data.name.trim(),
-      data.email.toLowerCase(),
-      data.phone.trim(),
+      email,
+      phone,
       data.address,
       data.profilePicture,
     );
@@ -57,11 +52,11 @@ export class Contact {
   }
 
   getEmail(): string {
-    return this.email;
+    return this.email.getValue();
   }
 
   getPhone(): string {
-    return this.phone;
+    return this.phone.getValue();
   }
 
   getAddress(): Address | undefined {
@@ -78,19 +73,11 @@ export class Contact {
     }
 
     if (data.email) {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(data.email)) {
-        throw new Error('Invalid email format');
-      }
-      this.email = data.email.toLowerCase();
+      this.email = Email.create(data.email);
     }
 
     if (data.phone) {
-      const phoneRegex = /^\+?[\d\s-()]{8,}$/;
-      if (!phoneRegex.test(data.phone)) {
-        throw new Error('Phone number must be at least 6 characters long');
-      }
-      this.phone = data.phone.trim();
+      this.phone = PhoneNumber.create(data.phone);
     }
 
     if (data.address) {
@@ -107,8 +94,8 @@ export class Contact {
       id: this.id,
       userId: this.userId,
       name: this.name,
-      email: this.email,
-      phone: this.phone,
+      email: this.email.getValue(),
+      phone: this.phone.getValue(),
       address: this.address?.toJSON(),
       profilePicture: this.profilePicture?.toJSON(),
     };

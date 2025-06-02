@@ -1,3 +1,5 @@
+import { Email } from '../value-objects/Email';
+
 export interface UserData {
   id?: string;
   email: string;
@@ -7,31 +9,23 @@ export interface UserData {
 export class User {
   constructor(
     readonly id: string,
-    private email: string,
+    private email: Email,
     private password: string,
   ) {}
 
   static create(data: UserData): User {
-    if (!data.email || !data.email.trim()) {
-      throw new Error('Email is required');
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(data.email)) {
-      throw new Error('Invalid email format');
-    }
-
-    return new User(data.id || crypto.randomUUID(), data.email.toLowerCase().trim(), data.password);
+    const email = Email.create(data.email);
+    return new User(data.id || crypto.randomUUID(), email, data.password);
   }
 
   getEmail(): string {
-    return this.email;
+    return this.email.getValue();
   }
 
   toJSON() {
     return {
       id: this.id,
-      email: this.email,
+      email: this.email.getValue(),
     };
   }
 }

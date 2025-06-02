@@ -30,7 +30,7 @@ describe('Contact Entity', () => {
       expect(contact).toBeInstanceOf(Contact);
       expect(contact.getName()).toBe('John Doe');
       expect(contact.getEmail()).toBe('john@example.com');
-      expect(contact.getPhone()).toBe('+1 (555) 123-4567');
+      expect(contact.getPhone()).toBe('+1(555)123-4567');
       expect(contact.getUserId()).toBe('user123');
     });
 
@@ -54,7 +54,7 @@ describe('Contact Entity', () => {
 
     it('should throw error for invalid phone', () => {
       expect(() => Contact.create({ ...validContactData, phone: '123' })).toThrow(
-        'Phone number must be at least 6 characters long',
+        'Invalid phone number format',
       );
     });
   });
@@ -100,7 +100,7 @@ describe('Contact Entity', () => {
 
     it('should update phone', () => {
       contact.updateDetails({ phone: '+1 (555) 987-6543' });
-      expect(contact.getPhone()).toBe('+1 (555) 987-6543');
+      expect(contact.getPhone()).toBe('+1(555)987-6543');
     });
 
     it('should throw error for invalid email update', () => {
@@ -110,9 +110,7 @@ describe('Contact Entity', () => {
     });
 
     it('should throw error for invalid phone update', () => {
-      expect(() => contact.updateDetails({ phone: '123' })).toThrow(
-        'Phone number must be at least 6 characters long',
-      );
+      expect(() => contact.updateDetails({ phone: '123' })).toThrow('Invalid phone number format');
     });
 
     it('should update address', () => {
@@ -143,9 +141,9 @@ describe('Contact Entity', () => {
         userId: validContactWithAddressData.userId,
         name: validContactWithAddressData.name,
         email: validContactWithAddressData.email,
-        phone: validContactWithAddressData.phone,
-        address: mockAddress.toJSON(),
-        profilePicture: mockProfilePicture.toJSON(),
+        phone: '+1(555)123-4567',
+        address: validContactWithAddressData.address?.toJSON(),
+        profilePicture: validContactWithAddressData.profilePicture?.toJSON(),
       });
     });
 
@@ -158,7 +156,7 @@ describe('Contact Entity', () => {
         userId: validContactData.userId,
         name: validContactData.name,
         email: validContactData.email,
-        phone: validContactData.phone,
+        phone: '+1(555)123-4567',
         address: undefined,
         profilePicture: undefined,
       });
