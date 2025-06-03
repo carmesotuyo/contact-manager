@@ -7,6 +7,5 @@ export interface ContactSearchCriteria extends BaseSearchCriteria {
 }
 
 export interface IContactRepository extends IBaseRepository<Contact, ContactSearchCriteria> {
-  findByEmail(email: string): Promise<Contact | null>;
   findByUserId(userId: string): Promise<Contact[]>;
 }
