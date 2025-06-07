@@ -4,6 +4,7 @@ import { BaseSearchCriteria, IBaseRepository } from './IBaseRepository';
 export interface NoteSearchCriteria extends BaseSearchCriteria {
   userId?: string;
   contactId?: string;
+  query?: string;
 }
 
 export interface INoteRepository extends IBaseRepository<Note, NoteSearchCriteria> {
