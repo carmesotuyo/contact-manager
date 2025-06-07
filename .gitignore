@@ -62,4 +62,7 @@ backend/docs/design/
 
 # Task tracking
 .project-tasks.json
-.project-rules.json 
+.project-rules.json
+
+# Backend specific
+**/generated/prisma/ 
