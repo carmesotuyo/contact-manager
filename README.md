@@ -18,7 +18,7 @@ Contact management platform for storing and managing contact information includi
 ### Backend: Hexagonal Architecture (Ports and Adapters)
 
 - Domain Layer: Core business logic and entities
-- Application Layer: Use cases and application services
+- Application Layer: Services and DTOs
 - Infrastructure Layer: External adapters and implementations
 - Interface Layer: API endpoints and controllers
 
@@ -66,7 +66,7 @@ Contact management platform for storing and managing contact information includi
 ├── backend/           # Express.js backend application
 │   └── src/
 │       ├── domain/    # Core business logic
-│       ├── application/ # Use cases and services
+│       ├── application/ # Services and DTOs
 │       ├── infrastructure/ # External concerns
 │       └── interfaces/ # API endpoints and middleware
 │
