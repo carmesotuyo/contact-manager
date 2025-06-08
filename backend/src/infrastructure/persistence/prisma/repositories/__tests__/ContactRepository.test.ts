@@ -62,6 +62,18 @@ describe('PrismaContactRepository', () => {
       expect(result[0]).toBeInstanceOf(Contact);
       expect(result[0].getUserId()).toBe('user123');
     });
+
+    it('should return empty array when no contacts found', async () => {
+      prismaMock.contact.findMany.mockResolvedValue([]);
+      const result = await repository.findByUserId('user123');
+      expect(result).toHaveLength(0);
+    });
+
+    it('should handle database errors', async () => {
+      const error = new Error('Database error');
+      prismaMock.contact.findMany.mockRejectedValue(error);
+      await expect(repository.findByUserId('user123')).rejects.toThrow('Database error');
+    });
   });
 
   describe('save', () => {
