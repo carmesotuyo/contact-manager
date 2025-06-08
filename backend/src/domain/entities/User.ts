@@ -22,6 +22,10 @@ export class User {
     return this.email.getValue();
   }
 
+  getPassword(): string {
+    return this.password;
+  }
+
   toJSON() {
     return {
       id: this.id,
