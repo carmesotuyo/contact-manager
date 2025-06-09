@@ -23,5 +23,6 @@ module.exports = {
     '!src/**/server.ts',
     '!src/**/index.ts',
     '!src/**/persistence/prisma/seed/**',
+    '!src/**/routes/**',
   ],
 };

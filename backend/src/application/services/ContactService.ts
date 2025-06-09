@@ -130,4 +130,12 @@ export class ContactService implements IContactService {
       limit: result.limit,
     };
   }
+
+  async getContactByIdAndValidateUser(id: string, userId: string): Promise<ContactResponseDTO> {
+    const contact = await this.contactRepository.findById(id);
+    if (!contact || contact.getUserId() !== userId) {
+      throw new Error('Contact not found');
+    }
+    return this.mapContactToDTO(contact);
+  }
 }
