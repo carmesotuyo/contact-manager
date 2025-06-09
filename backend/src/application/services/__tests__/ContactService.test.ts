@@ -375,4 +375,91 @@ describe('ContactService', () => {
       });
     });
   });
+
+  describe('getContactByIdAndValidateUser', () => {
+    it('should return contact when found and user matches', async () => {
+      const mockContact = Contact.create({
+        userId: 'user123',
+        name: 'John Doe',
+        email: 'john@example.com',
+        phone: '1234567890',
+      });
+
+      mockContactRepository.findById.mockResolvedValue(mockContact);
+
+      const result = await contactService.getContactByIdAndValidateUser('contact123', 'user123');
+
+      expect(mockContactRepository.findById).toHaveBeenCalledWith('contact123');
+      expect(result).toEqual({
+        id: expect.any(String),
+        userId: 'user123',
+        name: 'John Doe',
+        email: 'john@example.com',
+        phone: '1234567890',
+        address: undefined,
+        profilePicture: undefined,
+      });
+    });
+
+    it('should throw error when contact not found', async () => {
+      mockContactRepository.findById.mockResolvedValue(null);
+
+      await expect(
+        contactService.getContactByIdAndValidateUser('contact123', 'user123'),
+      ).rejects.toThrow('Contact not found');
+    });
+
+    it('should throw error when user does not match', async () => {
+      const mockContact = Contact.create({
+        userId: 'differentUser',
+        name: 'John Doe',
+        email: 'john@example.com',
+        phone: '1234567890',
+      });
+
+      mockContactRepository.findById.mockResolvedValue(mockContact);
+
+      await expect(
+        contactService.getContactByIdAndValidateUser('contact123', 'user123'),
+      ).rejects.toThrow('Contact not found');
+    });
+
+    it('should handle contact with full details', async () => {
+      const address = Address.create({
+        placeId: 'place123',
+        formattedAddress: '123 Main St',
+      });
+      const profilePicture = ProfilePicture.create({
+        filename: 'profile.jpg',
+      });
+
+      const mockContact = Contact.create({
+        userId: 'user123',
+        name: 'John Doe',
+        email: 'john@example.com',
+        phone: '1234567890',
+        address,
+        profilePicture,
+      });
+
+      mockContactRepository.findById.mockResolvedValue(mockContact);
+
+      const result = await contactService.getContactByIdAndValidateUser('contact123', 'user123');
+
+      expect(result).toEqual({
+        id: expect.any(String),
+        userId: 'user123',
+        name: 'John Doe',
+        email: 'john@example.com',
+        phone: '1234567890',
+        address: {
+          placeId: 'place123',
+          formattedAddress: '123 Main St',
+        },
+        profilePicture: {
+          url: '/uploads/profile-pictures/profile.jpg',
+        },
+      });
+    });
+  });
 });
