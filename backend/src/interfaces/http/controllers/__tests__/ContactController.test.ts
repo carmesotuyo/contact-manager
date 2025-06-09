@@ -1,13 +1,16 @@
 import { Request, Response } from 'express';
 import { ContactController } from '../ContactController';
 import { IContactService } from '../../../../application/ports/IContactService';
+import { INoteService } from '../../../../application/ports/INoteService';
 import {
   ContactResponseDTO,
   ContactListResponseDTO,
 } from '../../../../application/dtos/contacts.dto';
+import { NoteListResponseDTO } from '../../../../application/dtos/notes.dto';
 
 describe('ContactController', () => {
   let mockContactService: jest.Mocked<IContactService>;
+  let mockNoteService: jest.Mocked<INoteService>;
   let contactController: ContactController;
   let mockRequest: Partial<Request>;
   let mockResponse: Partial<Response>;
@@ -25,6 +28,15 @@ describe('ContactController', () => {
       getContactByIdAndValidateUser: jest.fn(),
     } as jest.Mocked<IContactService>;
 
+    mockNoteService = {
+      createNote: jest.fn(),
+      updateNote: jest.fn(),
+      deleteNote: jest.fn(),
+      getNotesByContact: jest.fn(),
+      getNotesByUser: jest.fn(),
+      searchNotes: jest.fn(),
+    } as jest.Mocked<INoteService>;
+
     mockJson = jest.fn();
     mockStatus = jest.fn().mockReturnThis();
     mockSend = jest.fn();
@@ -35,7 +47,7 @@ describe('ContactController', () => {
       send: mockSend,
     };
 
-    contactController = new ContactController(mockContactService);
+    contactController = new ContactController(mockContactService, mockNoteService);
   });
 
   describe('createContact', () => {
@@ -381,6 +393,81 @@ describe('ContactController', () => {
       mockContactService.deleteContact.mockRejectedValue('Unknown error');
 
       await contactController.deleteContact(mockRequest as Request, mockResponse as Response);
+
+      expect(mockStatus).toHaveBeenCalledWith(500);
+      expect(mockJson).toHaveBeenCalledWith({ message: 'Internal server error' });
+    });
+  });
+
+  describe('getNotesByContact', () => {
+    const mockNoteList: NoteListResponseDTO = {
+      items: [
+        {
+          id: 'note123',
+          userId: 'user123',
+          contactId: 'contact123',
+          text: 'Test note',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ],
+      total: 1,
+      page: 1,
+      limit: 10,
+    };
+
+    beforeEach(() => {
+      mockRequest = {
+        user: { id: 'user123' },
+        params: { contactId: 'contact123' },
+        query: { page: '1', limit: '10' },
+      };
+    });
+
+    it('should get notes by contact successfully', async () => {
+      mockNoteService.getNotesByContact.mockResolvedValue(mockNoteList);
+
+      await contactController.getNotesByContact(mockRequest as Request, mockResponse as Response);
+
+      expect(mockNoteService.getNotesByContact).toHaveBeenCalledWith('contact123', 'user123', {
+        page: 1,
+        limit: 10,
+      });
+      expect(mockJson).toHaveBeenCalledWith(mockNoteList);
+    });
+
+    it('should return 404 if contact not found', async () => {
+      mockNoteService.getNotesByContact.mockRejectedValue(new Error('Contact not found'));
+
+      await contactController.getNotesByContact(mockRequest as Request, mockResponse as Response);
+
+      expect(mockStatus).toHaveBeenCalledWith(404);
+      expect(mockJson).toHaveBeenCalledWith({ message: 'Contact not found' });
+    });
+
+    it('should return 400 if user not found', async () => {
+      mockRequest.user = undefined;
+
+      await contactController.getNotesByContact(mockRequest as Request, mockResponse as Response);
+
+      expect(mockStatus).toHaveBeenCalledWith(400);
+      expect(mockJson).toHaveBeenCalledWith({ message: 'User not found' });
+      expect(mockNoteService.getNotesByContact).not.toHaveBeenCalled();
+    });
+
+    it('should handle service errors', async () => {
+      mockNoteService.getNotesByContact.mockRejectedValue(new Error('Service error'));
+
+      await contactController.getNotesByContact(mockRequest as Request, mockResponse as Response);
+
+      expect(mockStatus).toHaveBeenCalledWith(400);
+      expect(mockJson).toHaveBeenCalledWith({ message: 'Service error' });
+    });
+
+    it('should handle non-Error exceptions', async () => {
+      mockNoteService.getNotesByContact.mockRejectedValue('Unknown error');
+
+      await contactController.getNotesByContact(mockRequest as Request, mockResponse as Response);
 
       expect(mockStatus).toHaveBeenCalledWith(500);
       expect(mockJson).toHaveBeenCalledWith({ message: 'Internal server error' });
