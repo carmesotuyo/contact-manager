@@ -22,7 +22,11 @@ export class User {
     return this.email.getValue();
   }
 
-  getPassword(): string {
+  /**
+   * Returns the hashed password for verification purposes.
+   * @internal This method should only be used by authentication services.
+   */
+  getHashedPassword(): string {
     return this.password;
   }
 

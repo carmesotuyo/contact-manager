@@ -21,7 +21,7 @@ export class AuthenticationService implements IAuthenticationService {
       throw new Error('Invalid email or password');
     }
 
-    const isValidPassword = await this.passwordService.verify(password, user.getPassword());
+    const isValidPassword = await this.passwordService.verify(password, user.getHashedPassword());
     if (!isValidPassword) {
       throw new Error('Invalid email or password');
     }

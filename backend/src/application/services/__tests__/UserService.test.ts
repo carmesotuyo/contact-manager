@@ -1,10 +1,12 @@
 import { User } from '../../../domain/entities/User';
 import { IUserRepository } from '../../../domain/ports/IUserRepository';
 import { UserService } from '../UserService';
+import { IPasswordService } from '../../../domain/ports/IPasswordService';
 
 describe('UserService', () => {
   let userService: UserService;
   let mockUserRepository: jest.Mocked<IUserRepository>;
+  let mockPasswordService: jest.Mocked<IPasswordService>;
   let userId: string;
   let testUser: User;
   let testEmail: string;
@@ -20,7 +22,12 @@ describe('UserService', () => {
       count: jest.fn(),
     };
 
-    userService = new UserService(mockUserRepository);
+    mockPasswordService = {
+      hash: jest.fn(),
+      verify: jest.fn(),
+    };
+
+    userService = new UserService(mockUserRepository, mockPasswordService);
 
     userId = 'user123';
     testEmail = 'test@example.com';
