@@ -13,22 +13,6 @@ Contact management platform for storing and managing contact information includi
 - Profile picture
 - Notes
 
-## Architecture
-
-### Backend: Hexagonal Architecture (Ports and Adapters)
-
-- Domain Layer: Core business logic and entities
-- Application Layer: Services and DTOs
-- Infrastructure Layer: External adapters and implementations
-- Interface Layer: API endpoints and controllers
-
-### Frontend: Feature-first Architecture
-
-- Feature Modules: Self-contained features (auth, contacts, notes)
-- Shared Components: Reusable UI components
-- Core Services: Common functionality and utilities
-- Global State: Redux for cross-feature state
-
 ## Technology Stack
 
 ### Frontend
@@ -45,8 +29,129 @@ Contact management platform for storing and managing contact information includi
 
 - Node.js with Express
 - TypeScript
+- PostgreSQL for database
+- Prisma as ORM
 - JWT for authentication
 - Hexagonal Architecture pattern
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- PostgreSQL 14+
+- npm or yarn
+- Git
+
+### Installation
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/carmesotuyo/contact-manager.git
+cd contact-manager
+```
+
+2. Install all dependencies:
+
+```bash
+npm run install:all
+```
+
+### Backend Setup
+
+1. Install PostgreSQL (if not installed):
+
+```bash
+brew install postgresql@14
+```
+
+2. Start PostgreSQL service:
+
+```bash
+brew services start postgresql@14
+```
+
+3. Navigate to backend directory:
+
+```bash
+cd backend
+```
+
+4. Create `.env` file with required configuration:
+
+```env
+# Database
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/contact_manager?schema=public"
+
+# Server
+PORT=3000
+JWT_SECRET=your_jwt_secret
+```
+
+5. Set up the database:
+
+```bash
+# Create database user and database
+createuser -s postgres
+createdb -U postgres contact_manager
+
+# Run database migrations
+npx prisma migrate dev
+
+# Seed initial users
+npm run seed
+```
+
+### Frontend Setup
+
+1. Navigate to frontend directory:
+
+```bash
+cd frontend
+```
+
+2. Create `.env.local` file:
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3000
+PORT=3001
+NEXT_PUBLIC_GOOGLE_PLACES_API_KEY=your_api_key
+```
+
+### Development
+
+Available scripts (from root directory):
+
+- `npm run dev` - Start both frontend and backend in development mode
+- `npm run dev:frontend` - Start only frontend
+- `npm run dev:backend` - Start only backend
+- `npm run build` - Build both applications
+- `npm run test` - Run tests for both applications
+- `npm run format` - Format code using Prettier
+
+### Default Users
+
+The seeding process creates three default users:
+
+| Email                  | Password    |
+| ---------------------- | ----------- |
+| john.doe@example.com   | password123 |
+| jane.smith@example.com | password123 |
+| admin@example.com      | password123 |
+
+### Development Tools
+
+#### Database Management
+
+You can use Prisma Studio to view and manage the database:
+
+```bash
+cd backend
+npx prisma studio
+```
+
+Then open http://localhost:5555 in your browser.
 
 ## Project Structure
 
@@ -76,59 +181,21 @@ Contact management platform for storing and managing contact information includi
     └── architecture/ # Architecture documentation
 ```
 
-## Getting Started
+## Architecture
 
-### Prerequisites
+### Backend: Hexagonal Architecture (Ports and Adapters)
 
-- Node.js 18+
-- npm or yarn
-- Git
+- Domain Layer: Core business logic and entities
+- Application Layer: Services and DTOs
+- Infrastructure Layer: External adapters and implementations
+- Interface Layer: API endpoints and controllers
 
-### Installation
+### Frontend: Feature-first Architecture
 
-1. Clone the repository:
-
-```bash
-git clone https://github.com/carmesotuyo/contact-manager.git
-cd contact-manager
-```
-
-2. Install all dependencies:
-
-```bash
-npm run install:all
-```
-
-3. Set up environment variables:
-
-Frontend (.env.local):
-
-```bash
-NEXT_PUBLIC_API_URL=http://localhost:3000
-PORT=3001
-NEXT_PUBLIC_GOOGLE_PLACES_API_KEY=your_api_key
-```
-
-Backend (.env):
-
-```bash
-PORT=3000
-JWT_SECRET=your_jwt_secret
-```
-
-### Development
-
-The project uses npm workspaces to manage both frontend and backend services. Available scripts:
-
-#### Main Commands
-
-- `npm run dev` - Start both frontend and backend in development mode
-- `npm run dev:frontend` - Start only frontend
-- `npm run dev:backend` - Start only backend
-- `npm run build` - Build both applications
-- `npm run test` - Run tests for both applications
-- `npm run format` - Format code using Prettier
-- `npm run clean` - Remove all generated files and dependencies
+- Feature Modules: Self-contained features (auth, contacts, notes)
+- Shared Components: Reusable UI components
+- Core Services: Common functionality and utilities
+- Global State: Redux for cross-feature state
 
 ## API Endpoints
 

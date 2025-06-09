@@ -59,7 +59,7 @@ describe('AuthenticationService', () => {
       expect(mockUserRepository.findByEmail).toHaveBeenCalledWith('test@example.com');
       expect(mockPasswordService.verify).toHaveBeenCalledWith(
         'correctPassword',
-        testUser.getPassword(),
+        testUser.getHashedPassword(),
       );
     });
 

@@ -2,9 +2,13 @@ import { User, UserData } from '../../domain/entities/User';
 import { IUserRepository } from '../../domain/ports/IUserRepository';
 import { UserResponseDTO } from '../dtos/users.dto';
 import { IUserService } from '../ports/IUserService';
+import { IPasswordService } from '../../domain/ports/IPasswordService';
 
 export class UserService implements IUserService {
-  constructor(private readonly userRepository: IUserRepository) {}
+  constructor(
+    private readonly userRepository: IUserRepository,
+    private readonly passwordService: IPasswordService,
+  ) {}
 
   private mapUserToDTO(user: User): UserResponseDTO {
     const json = user.toJSON();
@@ -20,9 +24,10 @@ export class UserService implements IUserService {
       throw new Error('Email already in use');
     }
 
+    const hashedPassword = await this.passwordService.hash(password);
     const userData: UserData = {
       email,
-      password,
+      password: hashedPassword,
     };
 
     const user = User.create(userData);

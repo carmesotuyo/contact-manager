@@ -54,13 +54,14 @@ export class PrismaUserRepository implements IUserRepository {
       const data = {
         id: user.id,
         email: user.getEmail(),
-        password: '', // Password will be set by auth service
+        password: user.getHashedPassword(),
       };
 
       const saved = await prisma.user.upsert({
         where: { id: user.id },
         update: {
           email: data.email,
+          password: data.password,
         },
         create: {
           id: data.id,
