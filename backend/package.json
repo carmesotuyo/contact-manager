@@ -9,7 +9,8 @@
     "start": "node dist/index.js",
     "format": "prettier --write \"src/**/*.ts\"",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "seed": "ts-node src/infrastructure/persistence/prisma/seed/index.ts"
   },
   "keywords": [
     "contact-manager",
@@ -42,6 +43,7 @@
     "jest-mock-extended": "^4.0.0-beta1",
     "prettier": "^3.5.3",
     "ts-jest": "^29.3.4",
+    "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.8.3"
