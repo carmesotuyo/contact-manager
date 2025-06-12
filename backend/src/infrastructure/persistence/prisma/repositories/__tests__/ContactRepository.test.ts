@@ -133,7 +133,7 @@ describe('PrismaContactRepository', () => {
       expect(result.getName()).toBe('Updated Name');
       expect(result.getEmail()).toBe('updated@example.com');
       expect(result.getAddress()?.getPlaceId()).toBe('place123');
-      expect(result.getProfilePicture()?.getUrl()).toBe('/uploads/profile-pictures/profile.jpg');
+      expect(result.getProfilePicture()?.getFilename()).toBe('profile.jpg');
     });
   });
 

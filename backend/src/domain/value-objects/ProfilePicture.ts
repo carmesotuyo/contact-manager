@@ -1,10 +1,10 @@
+import config from '../../infrastructure/config';
+
 export interface ProfilePictureProps {
-  filename: string; // e.g., "user123-profile.jpg"
+  filename: string;
 }
 
 export class ProfilePicture {
-  private static readonly UPLOADS_DIR = 'public/uploads/profile-pictures';
-
   constructor(private readonly filename: string) {}
 
   static create(props: ProfilePictureProps): ProfilePicture {
@@ -18,17 +18,9 @@ export class ProfilePicture {
     return this.filename;
   }
 
-  getPath(): string {
-    return `${ProfilePicture.UPLOADS_DIR}/${this.filename}`;
-  }
-
-  getUrl(): string {
-    return `/uploads/profile-pictures/${this.filename}`;
-  }
-
   toJSON() {
     return {
-      url: this.getUrl(),
+      url: `${config.uploads.profilePictures.url}/${this.filename}`,
     };
   }
 }

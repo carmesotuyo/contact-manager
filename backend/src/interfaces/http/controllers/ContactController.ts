@@ -18,17 +18,44 @@ export class ContactController {
       }
 
       const userId = req.user.id;
-      const result = await this.contactService.createContact({
+      const contactData = {
         ...req.body,
         userId,
-      });
+        profilePicture: req.file
+          ? {
+              filename: req.file.filename,
+            }
+          : undefined,
+      };
 
+      const result = await this.contactService.createContact(contactData);
       res.status(201).json(result);
     } catch (error) {
       if (error instanceof Error) {
-        res.status(400).json({ message: error.message });
-        return;
+        // Handle validation errors
+        if (
+          error.message.includes('Validation') ||
+          error.message.includes('Service') ||
+          error.message.includes('empty') ||
+          error.message.includes('Invalid file type')
+        ) {
+          res.status(400).json({ message: error.message });
+          return;
+        }
+
+        // Handle not found errors
+        if (error.message === 'Contact not found' || error.message.includes('not found')) {
+          res.status(404).json({ message: error.message });
+          return;
+        }
+
+        // Handle duplicate email error
+        if (error.message.includes('already have a contact with this email')) {
+          res.status(409).json({ message: error.message });
+          return;
+        }
       }
+
       res.status(500).json({ message: 'Internal server error' });
     }
   }
@@ -51,6 +78,16 @@ export class ContactController {
       const result = await this.contactService.getContactsByUser(userId, searchCriteria);
       res.json(result);
     } catch (error) {
+      if (error instanceof Error) {
+        if (error.message === 'Contact not found') {
+          res.status(404).json({ message: error.message });
+          return;
+        }
+        if (error.message.includes('Validation') || error.message.includes('Service')) {
+          res.status(400).json({ message: error.message });
+          return;
+        }
+      }
       res.status(500).json({ message: 'Internal server error' });
     }
   }
@@ -89,8 +126,16 @@ export class ContactController {
 
       const userId = req.user.id;
       const contactId = req.params.contactId;
+      const contactData = {
+        ...req.body,
+        profilePicture: req.file
+          ? {
+              filename: req.file.filename,
+            }
+          : undefined,
+      };
 
-      const result = await this.contactService.updateContact(contactId, userId, req.body);
+      const result = await this.contactService.updateContact(contactId, userId, contactData);
       res.json(result);
     } catch (error) {
       if (error instanceof Error) {
@@ -98,8 +143,10 @@ export class ContactController {
           res.status(404).json({ message: error.message });
           return;
         }
-        res.status(400).json({ message: error.message });
-        return;
+        if (error.message.includes('Validation') || error.message.includes('Service')) {
+          res.status(400).json({ message: error.message });
+          return;
+        }
       }
       res.status(500).json({ message: 'Internal server error' });
     }
@@ -123,8 +170,10 @@ export class ContactController {
           res.status(404).json({ message: error.message });
           return;
         }
-        res.status(400).json({ message: error.message });
-        return;
+        if (error.message.includes('Validation') || error.message.includes('Service')) {
+          res.status(400).json({ message: error.message });
+          return;
+        }
       }
       res.status(500).json({ message: 'Internal server error' });
     }
@@ -152,8 +201,10 @@ export class ContactController {
           res.status(404).json({ message: error.message });
           return;
         }
-        res.status(400).json({ message: error.message });
-        return;
+        if (error.message.includes('Validation') || error.message.includes('Service')) {
+          res.status(400).json({ message: error.message });
+          return;
+        }
       }
       res.status(500).json({ message: 'Internal server error' });
     }

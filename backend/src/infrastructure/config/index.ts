@@ -9,7 +9,12 @@ interface Config {
   jwtSecret: string;
   databaseUrl: string;
   googlePlacesApiKey: string;
-  uploadDir: string;
+  uploads: {
+    profilePictures: {
+      path: string; // Physical path where files are stored
+      url: string; // URL path where files are served
+    };
+  };
 }
 
 const config: Config = {
@@ -18,7 +23,15 @@ const config: Config = {
   jwtSecret: process.env.JWT_SECRET || 'your-secret-key',
   databaseUrl: process.env.DATABASE_URL || '',
   googlePlacesApiKey: process.env.GOOGLE_PLACES_API_KEY || '',
-  uploadDir: process.env.UPLOAD_DIR || path.resolve(__dirname, '../../../uploads'),
+  uploads: {
+    profilePictures: {
+      path: path.join(
+        process.env.UPLOAD_DIR || path.resolve(__dirname, '../../../uploads'),
+        'profile-pictures',
+      ),
+      url: '/uploads/profile-pictures',
+    },
+  },
 };
 
 const requiredEnvVars = ['DATABASE_URL', 'JWT_SECRET'];
