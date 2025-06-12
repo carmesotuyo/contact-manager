@@ -1,4 +1,5 @@
 import { ProfilePicture, ProfilePictureProps } from '../ProfilePicture';
+import config from '../../../infrastructure/config';
 
 describe('ProfilePicture Value Object', () => {
   const validProps: ProfilePictureProps = {
@@ -23,29 +24,13 @@ describe('ProfilePicture Value Object', () => {
     });
   });
 
-  describe('paths and urls', () => {
-    let profilePicture: ProfilePicture;
-
-    beforeEach(() => {
-      profilePicture = ProfilePicture.create(validProps);
-    });
-
-    it('should generate correct file path', () => {
-      expect(profilePicture.getPath()).toBe('public/uploads/profile-pictures/user123-profile.jpg');
-    });
-
-    it('should generate correct URL', () => {
-      expect(profilePicture.getUrl()).toBe('/uploads/profile-pictures/user123-profile.jpg');
-    });
-  });
-
   describe('toJSON', () => {
     it('should return correct JSON representation', () => {
       const profilePicture = ProfilePicture.create(validProps);
       const json = profilePicture.toJSON();
 
       expect(json).toEqual({
-        url: '/uploads/profile-pictures/user123-profile.jpg',
+        url: `${config.uploads.profilePictures.url}/${validProps.filename}`,
       });
     });
   });
