@@ -1,13 +1,13 @@
 # Dependencies
-/node_modules
+node_modules
 /.pnp
 .pnp.js
 
 # Testing
-/coverage
+coverage
 
 # Next.js
-/.next/
+**/.next/
 /out/
 /build
 
@@ -62,4 +62,8 @@ backend/docs/design/
 
 # Task tracking
 .project-tasks.json
-.project-rules.json 
+.project-rules.json
+
+# Backend specific
+**/generated/prisma/
+/backend/uploads/
