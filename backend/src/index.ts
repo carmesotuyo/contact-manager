@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
 import { createAuthRouter } from './interfaces/http/routes/auth.routes';
 import { createContactRouter } from './interfaces/http/routes/contact.routes';
 import { createNoteRouter } from './interfaces/http/routes/note.routes';
@@ -37,7 +38,8 @@ app.use(cors());
 app.use(express.json());
 
 // Serve uploaded files
-app.use(config.uploads.profilePictures.url, express.static(config.uploads.profilePictures.path));
+const uploadsPath = path.resolve(config.uploads.profilePictures.path);
+app.use(config.uploads.profilePictures.url, express.static(uploadsPath));
 
 // Routes
 const authRouter = createAuthRouter(authService);
