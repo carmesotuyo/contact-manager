@@ -65,4 +65,5 @@ backend/docs/design/
 .project-rules.json
 
 # Backend specific
-**/generated/prisma/ 
+**/generated/prisma/
+/backend/uploads/
