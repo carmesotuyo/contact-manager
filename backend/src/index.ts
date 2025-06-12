@@ -13,6 +13,7 @@ import { PrismaContactRepository } from './infrastructure/persistence/prisma/rep
 import { PrismaNoteRepository } from './infrastructure/persistence/prisma/repositories/NoteRepository';
 import { BcryptPasswordService } from './infrastructure/auth/services/BcryptPasswordService';
 import { JwtTokenService } from './infrastructure/auth/services/JwtTokenService';
+import config from './infrastructure/config';
 
 dotenv.config();
 
@@ -34,6 +35,9 @@ const authMiddleware = new AuthMiddleware(authService);
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Serve uploaded files
+app.use(config.uploads.profilePictures.url, express.static(config.uploads.profilePictures.path));
 
 // Routes
 const authRouter = createAuthRouter(authService);

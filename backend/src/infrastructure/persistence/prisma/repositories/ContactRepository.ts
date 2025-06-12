@@ -58,7 +58,7 @@ export class PrismaContactRepository implements IContactRepository {
         phone: contact.getPhone(),
         placeId: contact.getAddress()?.getPlaceId() || null,
         formattedAddress: contact.getAddress()?.getFormattedAddress() || null,
-        profilePicture: contact.getProfilePicture()?.getUrl() || null,
+        profilePicture: contact.getProfilePicture()?.getFilename() || null,
       };
 
       const saved = await prisma.contact.upsert({

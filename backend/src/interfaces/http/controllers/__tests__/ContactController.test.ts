@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { Readable } from 'stream';
 import { ContactController } from '../ContactController';
 import { IContactService } from '../../../../application/ports/IContactService';
 import { INoteService } from '../../../../application/ports/INoteService';
@@ -114,6 +115,119 @@ describe('ContactController', () => {
       };
 
       mockContactService.createContact.mockRejectedValue('Unknown error');
+
+      await contactController.createContact(mockRequest as Request, mockResponse as Response);
+
+      expect(mockStatus).toHaveBeenCalledWith(500);
+      expect(mockJson).toHaveBeenCalledWith({ message: 'Internal server error' });
+    });
+
+    it('should handle file upload when creating contact', async () => {
+      const mockFile: Express.Multer.File = {
+        fieldname: 'profilePicture',
+        originalname: 'test-profile.jpg',
+        encoding: '7bit',
+        mimetype: 'image/jpeg',
+        size: 1024,
+        destination: '/uploads',
+        filename: 'test-profile.jpg',
+        path: '/uploads/test-profile.jpg',
+        buffer: Buffer.from('test image content'),
+        stream: new Readable(),
+      };
+
+      mockRequest = {
+        body: {
+          name: 'John Doe',
+          email: 'john@example.com',
+          phone: '1234567890',
+        },
+        file: mockFile,
+        user: { id: 'user-123' },
+      };
+
+      const mockContact = {
+        id: 'contact-123',
+        userId: 'user-123',
+        name: 'John Doe',
+        email: 'john@example.com',
+        phone: '1234567890',
+        profilePicture: {
+          url: '/uploads/profile-pictures/test-profile.jpg',
+        },
+      };
+
+      mockContactService.createContact.mockResolvedValue(mockContact);
+
+      await contactController.createContact(mockRequest as Request, mockResponse as Response);
+
+      expect(mockContactService.createContact).toHaveBeenCalledWith({
+        ...mockRequest.body,
+        userId: 'user-123',
+        profilePicture: {
+          filename: mockFile.filename,
+        },
+      });
+      expect(mockStatus).toHaveBeenCalledWith(201);
+      expect(mockJson).toHaveBeenCalledWith(mockContact);
+    });
+
+    it('should handle duplicate email error', async () => {
+      mockRequest = {
+        body: {
+          name: 'John Doe',
+          email: 'existing@example.com',
+          phone: '1234567890',
+        },
+        user: { id: 'user-123' },
+      };
+
+      mockContactService.createContact.mockRejectedValue(
+        new Error('You already have a contact with this email address'),
+      );
+
+      await contactController.createContact(mockRequest as Request, mockResponse as Response);
+
+      expect(mockStatus).toHaveBeenCalledWith(409);
+      expect(mockJson).toHaveBeenCalledWith({
+        message: 'You already have a contact with this email address',
+      });
+    });
+
+    it('should handle invalid file type error', async () => {
+      mockRequest = {
+        body: {
+          name: 'John Doe',
+          email: 'john@example.com',
+          phone: '1234567890',
+        },
+        user: { id: 'user-123' },
+      };
+
+      mockContactService.createContact.mockRejectedValue(
+        new Error('Invalid file type. Only JPEG, PNG and GIF images are allowed.'),
+      );
+
+      await contactController.createContact(mockRequest as Request, mockResponse as Response);
+
+      expect(mockStatus).toHaveBeenCalledWith(400);
+      expect(mockJson).toHaveBeenCalledWith({
+        message: 'Invalid file type. Only JPEG, PNG and GIF images are allowed.',
+      });
+    });
+
+    it('should handle unknown error types during creation', async () => {
+      mockRequest = {
+        body: {
+          name: 'John Doe',
+          email: 'john@example.com',
+          phone: '1234567890',
+        },
+        user: { id: 'user-123' },
+      };
+
+      // Simulate an unknown error type (not an Error instance)
+      mockContactService.createContact.mockRejectedValue({ custom: 'error object' });
 
       await contactController.createContact(mockRequest as Request, mockResponse as Response);
 
@@ -335,6 +449,113 @@ describe('ContactController', () => {
       };
 
       mockContactService.updateContact.mockRejectedValue('Unknown error');
+
+      await contactController.updateContact(mockRequest as Request, mockResponse as Response);
+
+      expect(mockStatus).toHaveBeenCalledWith(500);
+      expect(mockJson).toHaveBeenCalledWith({ message: 'Internal server error' });
+    });
+
+    it('should handle file upload when updating contact', async () => {
+      const mockFile: Express.Multer.File = {
+        fieldname: 'profilePicture',
+        originalname: 'updated-profile.jpg',
+        encoding: '7bit',
+        mimetype: 'image/jpeg',
+        size: 1024,
+        destination: '/uploads',
+        filename: 'updated-profile.jpg',
+        path: '/uploads/updated-profile.jpg',
+        buffer: Buffer.from('test image content'),
+        stream: new Readable(),
+      };
+
+      mockRequest = {
+        params: { contactId: 'contact-123' },
+        body: {
+          name: 'Updated Name',
+        },
+        file: mockFile,
+        user: { id: 'user-123' },
+      };
+
+      const mockUpdatedContact = {
+        id: 'contact-123',
+        userId: 'user-123',
+        name: 'Updated Name',
+        email: 'john@example.com',
+        phone: '1234567890',
+        profilePicture: {
+          url: '/uploads/profile-pictures/updated-profile.jpg',
+        },
+      };
+
+      mockContactService.updateContact.mockResolvedValue(mockUpdatedContact);
+
+      await contactController.updateContact(mockRequest as Request, mockResponse as Response);
+
+      expect(mockContactService.updateContact).toHaveBeenCalledWith('contact-123', 'user-123', {
+        name: 'Updated Name',
+        profilePicture: {
+          filename: mockFile.filename,
+        },
+      });
+      expect(mockJson).toHaveBeenCalledWith(mockUpdatedContact);
+    });
+
+    it('should handle validation error during update', async () => {
+      mockRequest = {
+        params: { contactId: 'contact-123' },
+        body: {
+          email: 'invalid-email',
+        },
+        user: { id: 'user-123' },
+      };
+
+      mockContactService.updateContact.mockRejectedValue(
+        new Error('Validation failed: Invalid email format'),
+      );
+
+      await contactController.updateContact(mockRequest as Request, mockResponse as Response);
+
+      expect(mockStatus).toHaveBeenCalledWith(400);
+      expect(mockJson).toHaveBeenCalledWith({
+        message: 'Validation failed: Invalid email format',
+      });
+    });
+
+    it('should handle service errors during update', async () => {
+      mockRequest = {
+        params: { contactId: 'contact-123' },
+        body: {
+          name: 'Updated Name',
+        },
+        user: { id: 'user-123' },
+      };
+
+      mockContactService.updateContact.mockRejectedValue(
+        new Error('Service error: Failed to update profile picture'),
+      );
+
+      await contactController.updateContact(mockRequest as Request, mockResponse as Response);
+
+      expect(mockStatus).toHaveBeenCalledWith(400);
+      expect(mockJson).toHaveBeenCalledWith({
+        message: 'Service error: Failed to update profile picture',
+      });
+    });
+
+    it('should handle unknown error types during update', async () => {
+      mockRequest = {
+        params: { contactId: 'contact-123' },
+        body: {
+          name: 'Updated Name',
+        },
+        user: { id: 'user-123' },
+      };
+
+      // Simulate an unknown error type (not an Error instance)
+      mockContactService.updateContact.mockRejectedValue({ custom: 'error object' });
 
       await contactController.updateContact(mockRequest as Request, mockResponse as Response);
 
